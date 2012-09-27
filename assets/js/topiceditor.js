@@ -202,15 +202,18 @@ function doActualSave()
         }
       }
     }
-    requestURL="/seam/resource/rest/1/topic/put/json";  
-    requestString="?topicid="+topicID+"&serverurl="+serverURL+"&requestport="+port+"&requesturl="+urlpath+requestURL;    
+    requestURL="/seam/resource/rest/1/topic/update/json";  
      saveAjaxRequest.global=true;
-    //alert(restProxy+"restput"+requestString);
-    saveAjaxRequest.open("POST", nodeServer + "/restput" + requestString, true);
-    saveAjaxRequest.setRequestHeader("Content-Type", "text/xml");
-    var textToSave=editor.getValue();
-    //ajaxStart();
-    saveAjaxRequest.send(textToSave);
+
+    saveAjaxRequest.open("POST", 'http://' + skynetURL + requestURL, true);
+    saveAjaxRequest.setRequestHeader("Content-Type", "application/json");
+    var updateObject={
+      'id' : topicID,
+      'configuredParameters' : ['xml'],
+      'xml' : editor.getValue()};
+      updateString=JSON.stringify(updateObject);
+
+    saveAjaxRequest.send(updateString);
 }
 
 // Sends the editor content to a node server for validation
@@ -407,25 +410,6 @@ function injectPreviewLink()
   $("#preview-link").html('<a href="preview.html?skyneturl=http://'+skynetURL+'&topicid='+topicID+'">Preview Link</a>');
 }
 
-function doActualSaveCORS(){
-
-  var updateString="";
-  var updateObject={
-  'id' : topicID,
-  'configuredParameters' : ['xml'],
-  'xml' : editor.getValue()
-  };
-  updateString=JSON.stringify(updateObject);
-  saveAjaxRequest = new XMLHttpRequest();
-  
-  requestURL="/seam/resource/rest/1/topic/put/json";
-  requeststring=skynetURL+requestURL;
-  
-  
-
-}
-
-
 // This function loads the topic xml via JSONP, without a proxy
 function loadSkynetTopicJsonP(topicID, skynetURL)
 {
@@ -456,7 +440,6 @@ function onPreviewPageLoad()
 
 function serverTopicLoadCallback(topicAjaxRequest)
 {
-
   if (topicAjaxRequest.readyState==4)
   {
     if (topicAjaxRequest.status == 200 || topicAjaxRequest.status == 304)
