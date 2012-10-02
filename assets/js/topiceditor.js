@@ -678,7 +678,7 @@ function doFindNext(){
 }
 
 function doFindPrevious(){
-  CodeMirror.commands.findPrevious(editor);
+  CodeMirror.commands.findPrev(editor);
 }
 
 function doReplaceAll(){
