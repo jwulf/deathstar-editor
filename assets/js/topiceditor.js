@@ -646,7 +646,12 @@ function initializeTopicEditPage(){
     $("#tagwrap-button").click(doTagWrap);
     $("#codetabs-lite-button").click(injectCodetabsLite);
     $("#auto-complete-toggle").click(toggleAutoCloseTag);
-    
+    $("#find-button").click(doFind);
+    $("#replace-button").click(doReplace);
+    $("#find-next-button").click(doFindNext);
+    $("#find-previous-button").click(doFindPrevious);
+    $("#replace-all-button").click(doReplaceAll);
+
     $('.inject-template').click(injectTemplate);
 
     // function handler for the validation error text show/hide
@@ -663,14 +668,30 @@ function initializeTopicEditPage(){
     
   resizePanes();
 
-
-    // topicid and skyneturl need to be written into the url by fixlinks.php / fixlinks in docs-hack-fixlinks.js
-    generateRESTParameters();
-  
+    generateRESTParameters();  
     loadSkynetTopicJsonP(topicID,skynetURL);
     skynetButtonURL="http://"+skynetURL+"/TopicEdit.seam?topicTopicId="+topicID;
 }
 
+function doFindNext(){
+  CodeMirror.commands.findNext(editor);
+}
+
+function doFindPrevious(){
+  CodeMirror.commands.findPrevious(editor);
+}
+
+function doReplaceAll(){
+  CodeMirror.commands.replaceAll(editor);
+}
+
+function doFind(){
+  CodeMirror.commands.find(editor);
+}
+
+function doReplace(){
+  CodeMirror.commands.replace(editor);
+}
 
 // This is a generic click handler for Insert Docbook sub-menu entries
 // It uses the id attribute of the sub-menu entry to look up the template in a 

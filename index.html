@@ -65,7 +65,7 @@
                
               <!-- Start Toolbar buttons -->
 				   
-				   <div class="btn-group">
+		   <div class="btn-group">
                    <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#" rel="popover" data-content="Insert Docbook templates" data-original-title="Insert Docbook">
                    Insert Docbook
                    <span class="caret"></span>
@@ -81,9 +81,25 @@
                    </ul>
                 </div>
 				   
-				   <div class="btn-group">
-  	            <button class="btn btn-mini" rel="popover" data-content="Wrap a text selection in an XML tag. Hotkey: Ctrl-Shift-D" data-original-title="XML Tag Wrap Selection" id="tagwrap-button">XML Tag Wrap Selection</span>
-              </div>
+		<div class="btn-group">
+  	            <button class="btn btn-mini" rel="popover" data-content="Wrap a text selection in an XML tag. Hotkey: Ctrl-Shift-D" data-original-title="XML Tag Wrap Selection" id="tagwrap-button">XML Tag Wrap</span>
+		</div>
+
+		<!-- Find and Replace -->
+		<div class="btn-group">
+  	            <button class="btn btn-mini" rel="popover" data-content="Find Previous. Hot Key: Shift-Ctrl-F / Cmd-Option-F" data-original-title="Find Previous" id="find-previous-button">&lt;</button>
+		    <button class="btn btn-mini" rel="popover" data-content="Find text in the current topic. Hotkey: Ctrl-F / Cmd-F" data-original-title="Find" id="find-button">Find</button>
+  	            <button class="btn btn-mini" rel="popover" data-content="Find Next. Hot Key: Ctrl-G / Cmd-G" data-original-title="Find Next" id="find-next-button">&gt;</button>
+
+  	            <button class="btn btn-mini" rel="popover" data-content="Replace text in the current topic. Hotkey: Shift-Ctrl-F / Cmd-Option-F. | Replace All - Hot key: Shift-Ctrl-R / Shift-Cmd-Option-F" data-original-title="Replace" id="replace-button">Replace</button>
+		    <button class="btn dropdown-toggle" data-toggle="dropdown">
+    			<span class="caret"></span>
+  		    </button>
+  		    <ul class="dropdown-menu">
+		  	            <li><a href="#" id="replace-all-button">Replace All</a></li>
+  			</ul>
+                </div>
+
               <!-- End Toolbar buttons -->
 
               <!-- Start Toggles -->
@@ -142,6 +158,12 @@
                 <p><b>Code Tabs</b></p>
                 <p>The <b>redhat-video</b> brand contains Javascript that renders program listings with multiple code language variations in a tabbed view, and allows a reader to select their preferred programming language for the book. The <i>Code Tabs</i> button injects a template based on variablelist that produces these tabbed dialogs when using the redhat-video brand, and displays as a sequence of titled programlistings when using other brands.</p> 
                 <p>Code Tabs-lite produces a stripped down template for code listings with only one programming language.</p>
+		<p><b>Find and Replace</b></p>
+ 		<p>Ctrl-F / Cmd-F = Start searching</p>
+		<p>Ctrl-G / Cmd-G = Find next</p>
+		<p>Shift-Ctrl-G / Shift-Cmd-G = Find previous</p>
+		<p>Shift-Ctrl-F / Cmd-Option-F = Replace</p>
+		<p>Shift-Ctrl-R / Shift-Cmd-Option-F = Replace all</p>
                 <p><b>Open in Skynet</b></p>
                 <p>To edit the title of a Skynet topic, you need to open it in Skynet. Click on the topic title above the editor or the <b>Open in Skynet</b> button beneath the editor to do that. Make sure you save all local changes first. Reload the editor page to view any changes you make in Skynet.</p>
   
