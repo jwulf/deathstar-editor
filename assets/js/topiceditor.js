@@ -559,14 +559,14 @@ function initializeTopicEditPage(){
     var paneSize;
     // resize codemirror editor width
     paneSize = $('.ui-layout-center').width();
-    $('.CodeMirror, .CodeMirror-scroll').css('width', paneSize - 12);
+    $('.CodeMirror, .CodeMirror-scroll').css('width', paneSize - 15);
 
     // resize preview tab 
-    $('#div-preview-pane').width(paneSize - 12);
+    $('#div-preview-pane').width(paneSize - 15);
 
     // resize codemirror editor height
     paneSize = $('.ui-layout-center').height();
-    $('.CodeMirror, .CodeMirror-scroll').css('height', paneSize - 154);
+    $('.CodeMirror, .CodeMirror-scroll').css('height', paneSize - 160);
 
     $('.CodeMirror').trigger("resize"); 
 
