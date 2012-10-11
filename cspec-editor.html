@@ -1,0 +1,148 @@
+<html lang="en-US">
+<head>
+	<title>Deathstar Content Spec Editor</title>
+	<link href="assets/css/bootstrap.css" rel="stylesheet">
+	<link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+	<link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+	<link href="assets/css/codemirror.css" rel="stylesheet">
+	<link href="assets/css/codemirror-dialog.css" rel="stylesheet">
+	<link href="assets/css/deathstar.css" rel="stylesheet">
+	<link href="assets/css/jquery-ui-1.8.23.custom.css" rel="stylesheet">
+	<link href="assets/css/docs.css" rel="stylesheet">
+
+	<script type="text/javascript">pageIsEditor=true;</script>
+
+	<script src="assets/js/jquery-1.7.2.min.js"></script> 
+	<script src="assets/js/jquery-ui-1.8.23.custom.min.js"></script>
+	<script src="assets/js/bootstrap-tab.js"></script>
+	<script src="assets/js/bootstrap-tooltip.js"></script>
+	<script src="assets/js/bootstrap-popover.js"></script>
+	<script src="assets/js/bootstrap-button.js"></script>
+	<script src="assets/js/bootstrap-dropdown.js"></script>
+	<script src="assets/js/jquery.layout-latest.js"></script>
+	<script src="assets/js/codemirror.js"></script>
+	<script src="assets/js/codemirror-search.js"></script>
+	<script src="assets/js/codemirror-searchcursor.js"></script>
+	<script src="assets/js/codemirror-dialog.js"></script>
+	<script src="assets/js/closetag.js"></script>
+	<script src="assets/js/xml.js"></script>
+	<script src="assets/js/deathstar-editor-common.js"></script>
+	<script src="assets/js/pressgang-rest-utils.js"></script>
+	<script src="assets/js/cspec-editor.js"></script>
+  <!--  <script src="assets/js/deathstar-editor.js"></script>
+  <script src="assets/js/topiceditor.js"></script> -->
+</head>
+
+<body onload="specEditorload()">
+
+	<div class="ui-layout-north">
+		<div class="titlediv navbar"> 
+			<div class="navbar-inner"> 
+				<span id="page-title" class="brand">Deathstar Editor</span>
+			</div> 
+		</div> 
+	</div>
+	<!--  <div class="container"> -->
+
+	<div class="ui-layout-center">    
+		<div class="subnav">
+			<ul id="myTab" class="nav nav-tabs">
+				<li class="active">
+					<a href="#edit" data-toggle="tab">Edit</a>
+				</li>
+				<!-- <li class>
+					<a href="#preview" data-toggle="tab">Preview</a>
+				</li>
+				<li class> -->
+					<a href="#help" data-toggle="tab">Help</a>
+				</li>
+				<!-- <li class>
+					<a href="#docbook" data-toggle="tab">Docbook Reference</a>
+				</li> -->
+			</ul>
+
+			<div class="tab-content">
+
+				<div class="tab-pane fade active in" id="edit">
+					<div class="btn-toolbar" id="toolbuttons"><!-- 
+
+						<div class="btn-group">
+							<a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#" rel="popover" data-content="Insert Docbook templates" data-original-title="Insert Docbook">
+								Insert Docbook
+								<span class="caret"></span>
+							</a>
+							<ul class="dropdown-menu">
+								<li><a href="#" rel="popover" data-content="Inject a template for a code example with multiple programming language versions" data-original-title="Code Tabs" id="codetabs-button">Code Tabs</a></li>
+								<li><a href="#" rel="popover" data-content="Inject a template for a code example with a single programming language version" data-original-title="Code Tabs Lite" id="codetabs-lite-button">Code Tabs-lite</a></li>
+								<li><a href="#" class="inject-template" id="inject-picture">Skynet Image</a></li>
+								<li><a href="#" class="inject-template" id="inject-procedure">&lt;procedure&gt;</a></li>
+								<li><a href="#" class="inject-template" id="inject-twocolumntable">&lt;table&gt; (2-col)</a></li>
+								<li><a href="#" class="inject-template" id="inject-threecolumntable">&lt;table&gt; (3-col)</a></li>
+								<li><a href="#" class="inject-template" id="inject-varlistentry" rel="popover" data-content="Inject a template for a &lt;varlistentry&gt;" data-original-title="&lt;varlistentry&gt;">&lt;varlistentry&gt;</a></li>
+							</ul>
+						</div>
+
+						<div id="buttons-xml-tag-wrap" class="btn-group">
+							<button class="btn btn-mini" rel="popover" data-content="Wrap a text selection in an XML tag. Hotkey: Ctrl-Shift-D" data-original-title="XML Tag Wrap Selection" id="tagwrap-button">XML Tag Wrap</button>
+						</div>
+
+						<div id="buttons-find-and-replace" class="btn-group">
+							<button class="btn btn-mini" rel="popover" data-content="Find Previous. Hot Key: Shift-Ctrl-F / Cmd-Option-F" data-original-title="Find Previous" id="find-previous-button">&lt;</button>
+							<button class="btn btn-mini" rel="popover" data-content="Find text in the current topic. Hotkey: Ctrl-F / Cmd-F" data-original-title="Find" id="find-button">Find</button>
+							<button class="btn btn-mini" rel="popover" data-content="Find Next. Hot Key: Ctrl-G / Cmd-G" data-original-title="Find Next" id="find-next-button">&gt;</button>
+
+							<button class="btn btn-mini" rel="popover" data-content="Replace text in the current topic. Hotkey: Shift-Ctrl-F / Cmd-Option-F. | Replace All - Hot key: Shift-Ctrl-R / Shift-Cmd-Option-F" data-original-title="Replace" id="replace-button">Replace</button>
+							<button class="btn dropdown-toggle" data-toggle="dropdown">
+								<span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu">
+								<li><a href="#" id="replace-all-button">Replace All</a></li>
+							</ul>
+						</div>
+
+						<div id="buttons-toggles" class="btn-group" data-toggle="buttons-checkbox">
+							<button id="tagCloseToggle" class="btn btn-mini btn-primary" rel="popover" data-content="Toggle automatic XML tag closure on/off" data-original-title="Close XML Tags">Close XML Tags</button>
+							<button class="btn btn-mini btn-primary" rel="popover" data-content="Toggle interface help hints on/off" data-original-title="Show Help Hints" id="helpHintToggle">Show Hints</button>
+						</div>
+
+					 --></div>
+
+
+					<form><textarea id="code" name="code"></textarea></form>
+
+					<div class="btn-toolbar" id="editor-buttons">
+
+						<button id="validate-button" class="btn" rel="popover" data-original-title="Validate" data-content="Perform Docbook DTD validation of the editor content using a web service">Validate</button>
+
+						<button class="btn" id="save-button" rel="popover" data-original-title="Save" data-content="Push the contentspec to the server" >Push</button>
+
+						<button class="btn" id="revert-button" rel="popover" data-original-title="Revert" data-content="Reload the editor content from the server">Revert</button>
+
+						<button class="btn" id="skynet-button" rel="popover" data-original-title="Open in Skynet" data-content="Open the topic in the Skynet editor">Open in Skynet</button>
+					</div>
+
+				</div>
+
+				<div class="tab-pane fade" id="preview">
+					<div id="div-preview-pane" class="div-preview"></div>
+				</div>
+				<div class="tab-pane fade" id="help"></div>
+				<!--   <div class="tab-pane fade" id="docbook"></div> -->
+
+
+			</div>
+		</div>
+	</div>
+	<div class="ui-layout-east">
+		<div id="div-preview-inline" class="div-preview"></div>
+	</div>
+
+	<div class="ui-layout-south">
+		<div id="validation-toggle" class="validation-toggle">
+			<a id="status-message" href="#"></a>
+		</div>
+		<div id="div-validation" class="div-validation"></div>
+	</div>
+	<!--</div>-->
+</body>
+</html>
