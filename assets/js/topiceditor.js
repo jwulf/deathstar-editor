@@ -4,8 +4,9 @@
 // 2. Add buttons to insert elements
 // 3. General usability enhancements like coloured state messages and action button locations
 
-nodeServer="http://deathstar1.usersys.redhat.com:8888"
+defaultnodeServer="http://deathstar1.usersys.redhat.com:8888"
 // window.previewserverurl="http://127.0.0.1:8888";
+var nodeServer;
 window.refreshTime=1000;
 window.timerID=0;
 window.clientXSLFile="assets/xsl/docbook2html.xsl";
@@ -13,35 +14,14 @@ window.clientXSLFile="assets/xsl/docbook2html.xsl";
 window.mutex=0;
 validXML=false;
 var validationServerResponse;
-var port;
+  var port;
 var urlpath;
 var serverURL;
 var topicID;
 var skynetURL;
 var helpHintsOn;
 
-function setCookie(c_name,value,exdays)
-{
-var exdate=new Date();
-exdate.setDate(exdate.getDate() + exdays);
-var c_value=escape(value) + ((exdays==null) ? "" : "; expires="+exdate.toUTCString());
-document.cookie=c_name + "=" + c_value;
-}
 
-function getCookie(c_name)
-{
-var i,x,y,ARRcookies=document.cookie.split(";");
-for (i=0;i<ARRcookies.length;i++)
-{
-  x=ARRcookies[i].substr(0,ARRcookies[i].indexOf("="));
-  y=ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1);
-  x=x.replace(/^\s+|\s+$/g,"");
-  if (x==c_name)
-    {
-    return unescape(y);
-    }
-  }
-}
 
 $(window).keypress(function(event) {
     if (!(event.which == 115 && event.ctrlKey) && !(event.which == 19)) return true;
@@ -126,15 +106,6 @@ function doValidate(callback)
   }
 }
 
-function makeValidityAmbiguous(){
-  if (validXML)
-  {
-    $("#validate-button").prop("disabled", false);
-    showStatusMessage('Modified', '', 'alert-info');
-  }
-    enableSaveRevert();
-}
-
 function hideSpinner(spinner){
 	$(spinner).css("visibility", "hidden");
 }
@@ -159,66 +130,107 @@ function doSave()
   return false;
 }
 
-function showStatusMessage(message, error, alertType)
-{
-   var statusMessage;
-	if (! alertType == '')
-	   statusMessage = '<div class="alert ' + alertType +'">' + message + '</div>';
-	else
-	   statusMessage = '<div>'+ message + '</div>';
-	$("#status-message").html(statusMessage);
-	$("#div-validation").html(error);
-}
-
 function doActualSave()  
 {
 	if (! validXML && validationServerResponse == 1)
-	  {
+	{
 	    alert("This is not valid Docbook XML. If you are using Skynet injections I cannot help you.");
       $("#validate-button").prop("disabled", false);
-	  }
-    if (validationServerResponse == 0)
-    	{
-    	alert("Unable to perform validation. Saving without validation.");
-    	}
-    showStatusMessage("Performing Save...", '', 'alert-info')
-	  saveAjaxRequest= new XMLHttpRequest();
-    saveAjaxRequest.onreadystatechange=function()
-    {
-      if (saveAjaxRequest.readyState==4)
-      {
-       // ajaxStop();
-        if (saveAjaxRequest.status == 200 || saveAjaxRequest.status == 304)
-        {     
-          showStatusMessage("Saved OK", '', 'alert-success');
+	}
+  if (validationServerResponse == 0)
+    alert("Unable to perform validation. Saving without validation.");
+
+  showStatusMessage("Performing Save...", '', 'alert-info');
+
+  requestURL="/seam/resource/rest/1/topic/update/json";  
+ 
+/*    var postit = $.post('http://'+ skynetURL + requestURL, {
+      'id' : topicID,
+      'configuredParameters' : ['xml'],
+      'xml' : editor.getValue()}, 
+      function(data){
+        showStatusMessage("Saved OK", '', 'alert-success');
           $("#save-button").prop("disabled", true);
           $("#revert-button").prop("disabled", true);
           if (! validXML) doValidate();
-        }
-        else
-        {
-          showStatusMessage("Error saving. Status code: " + saveAjaxRequest.status, '', 'alert-error');
-          enableSaveRevert();
-        }
+      }, 'application/json; charset=UTF-8')
+    .error(function(a){
+      showStatusMessage("Error saving. Status code: " + a.status, '', 'alert-error');
+      enableSaveRevert();
+    });
+	 */
+    
+  saveAjaxRequest= new XMLHttpRequest();
+  saveAjaxRequest.global=true;
+  saveAjaxRequest.onreadystatechange=function()
+  {
+    if (saveAjaxRequest.readyState==4)
+    {
+     // ajaxStop();
+      if (saveAjaxRequest.status == 200 || saveAjaxRequest.status == 304)
+      {     
+        showStatusMessage("Saved OK", '', 'alert-success');
+        $("#save-button").prop("disabled", true);
+        $("#revert-button").prop("disabled", true);
+        if (! validXML) doValidate();
       }
+      else
+      {
+        showStatusMessage("Error saving. Status code: " + saveAjaxRequest.status, '', 'alert-error');
+        enableSaveRevert();
+      }
+   
     }
-    requestURL="/seam/resource/rest/1/topic/update/json";  
-     saveAjaxRequest.global=true;
+  }
+  requestURL="/seam/resource/rest/1/topic/update/json";  
+   saveAjaxRequest.global=true;
 
-    saveAjaxRequest.open("POST", 'http://' + skynetURL + requestURL, true);
-    saveAjaxRequest.setRequestHeader("Content-Type", "application/json");
-    var updateObject={
-      'id' : topicID,
-      'configuredParameters' : ['xml'],
-      'xml' : editor.getValue()};
-      updateString=JSON.stringify(updateObject);
+  saveAjaxRequest.open("POST", 'http://' + skynetURL + requestURL, true);
+  saveAjaxRequest.setRequestHeader("Content-Type", "application/json");
+  var updateObject = {
+    'id' : topicID,
+    'configuredParameters' : ['xml'],
+    'xml' : editor.getValue()
+  };
+  updateString=JSON.stringify(updateObject);
 
-    saveAjaxRequest.send(updateString);
+  saveAjaxRequest.send(updateString);  
 }
 
 // Sends the editor content to a node server for validation
 function serversideValidateTopic(editor, callback){
-  ajaxRequest = new XMLHttpRequest();
+
+  function validationCallback(data, cb){
+      validationServerResponse=1;
+      if (data == "0")
+      { 
+        showStatusMessage("Topic XML is valid Docbook 4.5",'', 'alert-success');
+        validXML=true;
+        $("#validate-button").prop('disabled', true); 
+        if (callback && typeof(callback)=="function") callback(); 
+        } 
+      else {
+        showStatusMessage('Topic has errors (click to reveal/hide)', data, 'alert-error');
+        validXML=false;
+        cb && cb();
+      }
+  }
+
+  $.post(nodeServer + "/topicvalidate", editor.getValue(),
+    function(data){
+      validationCallback(data, callback);
+    })
+  .error(function(a){
+      // WORKAROUND: Google Chrome calls the error function on status 200, so this is workaround
+    if (a.status == 200){ validationCallback(a.responseText, callback)}
+      else
+      {
+    showStatusMessage("Communication error requesting validation: " + a.status + ':' + a.responseText, '', 'alert-error');
+    callback && callback();
+    }
+  })
+
+  /*ajaxRequest = new XMLHttpRequest();
   //ajaxStart();
   ajaxRequest.onreadystatechange=function()
   {
@@ -250,7 +262,7 @@ function serversideValidateTopic(editor, callback){
   validationServerReponse=0;
   ajaxRequest.open("POST", nodeServer + "/topicvalidate", true);
   ajaxRequest.setRequestHeader("Content-Type", "text/xml");
-  ajaxRequest.send(editor.getValue());
+  ajaxRequest.send(editor.getValue());*/
 }
 
 function updateXMLPreviewRoute(cm,preview){
@@ -285,12 +297,6 @@ function clientsideUpdateXMLPreview(cm, preview){
     xsltProcessor.importStylesheet(xsl);
     resultDocument = xsltProcessor.transformToFragment(xml,document);
     $(preview).html(resultDocument);
-/*      divpreview=document.getElementById("div-preview");
-      if (divpreview.hasChildNodes)
-        while(divpreview.hasChildNodes())
-          divpreview.removeChild(divpreview.lastChild);
-       
-      divpreview.appendChild(resultDocument); */
   }
   catch(err)
   {
@@ -302,12 +308,14 @@ function clientsideUpdateXMLPreview(cm, preview){
 // for REST GET and POST of the topic XML
 function generateRESTParameters()
 {
-  topicID = url_query('topicid');
-  skynetURL = url_query('skyneturl');
+  var params = extractURLParameters();
+
+  skynetURL = params.skynetURL;
+  nodeServer = params.nodeServer;
+  topicID = params.topicID;
+
   // Take off the leading "http://", if it exists
   if (! skynetURL === false)  {
-    if (skynetURL.indexOf("http://") !== -1)    
-      skynetURL=skynetURL.substring(7);
 
     portstart=skynetURL.indexOf(":");
     portend=skynetURL.indexOf("/");
@@ -376,21 +384,6 @@ function serversideUpdateXMLPreview(cm, serverFunction){
   }
 }*/
 
-// Parse URL Queries
-// from http://www.kevinleary.net/get-url-parameters-javascript-jquery/
-function url_query( query ) {
-	query = query.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-	var expr = "[\\?&]"+query+"=([^&#]*)";
-	var regex = new RegExp( expr );
-	var results = regex.exec( window.location.href );
-	if( results !== null ) {
-		return results[1];
-		return decodeURIComponent(results[1].replace(/\+/g, " "));
-	} else {
-		return false;
-	}
-}
-
 function setPageTitle(topicTitle)
 {
   var titleHTML;
@@ -411,13 +404,11 @@ function injectPreviewLink()
 }
 
 // This function loads the topic xml via JSONP, without a proxy
-function loadSkynetTopicJsonP(topicID, skynetURL)
+function loadSkynetTopic()
 {
   if (topicID && skynetURL) 
   {
-    requestURL="/seam/resource/rest/1/topic/get/jsonp/"+topicID+"?callback=?";  
-    requeststring=skynetURL+requestURL;
-    $.getJSON("http://"+requeststring, function(json) {
+    loadSkynetTopicJsonP(topicID, skynetURL, function(json) {
     if (json.xml == "") json.xml="<section>\n\t<title>"+json.title+"</title>\n\n\t<para>Editor initialized empty topic content</para>\n\n</section>";      
     if (pageIsEditor) {
       window.editor.setValue(json.xml);
@@ -435,7 +426,7 @@ function loadSkynetTopicJsonP(topicID, skynetURL)
 function onPreviewPageLoad()
 {
   generateRESTParameters();
-  loadSkynetTopicJsonP(topicID, skynetURL)
+  loadSkynetTopic()
 }
 
 function serverTopicLoadCallback(topicAjaxRequest)
@@ -464,9 +455,10 @@ function serverTopicLoadCallback(topicAjaxRequest)
   }
 
 }
+
 // This function loads the topic xml using a node.js proxy server
 // Currently unused, as we're loading via JSONP
-function loadSkynetTopicNodeProxy(topicID,skynetURL)
+/*function loadSkynetTopicNodeProxy(topicID,skynetURL)
 { 
  if (topicID && skynetURL) 
   {
@@ -481,7 +473,7 @@ function loadSkynetTopicNodeProxy(topicID,skynetURL)
     topicAjaxRequest.open("GET", nodeServer + "/restget" + requestString, true);
     topicAjaxRequest.send(null);
     }
-}
+} */
       
 function enableSaveRevert()
 {
@@ -493,14 +485,10 @@ function enableSaveRevert()
   }
 }
 
-function disableSaveRevert()
-{
-    $('#save-button').prop('disabled', true);
-    $('#revert-button').prop('disabled', true);
-}
+
 
 function doRevert(){
-    loadSkynetTopicJsonP(topicID,skynetURL);
+    loadSkynetTopic();
 }
 
 
@@ -587,7 +575,7 @@ function initializeTopicEditPage(){
 			"'/'": function(cm) { cm.closeTag(cm, '/'); }
   		},	   			
 		onChange: function(cm, e) {
-          		enableSaveRevert();
+      enableSaveRevert();
 			makeValidityAmbiguous();
 			},
 		onKeyEvent: function(cm, e) {
@@ -669,7 +657,7 @@ function initializeTopicEditPage(){
   resizePanes();
 
     generateRESTParameters();  
-    loadSkynetTopicJsonP(topicID,skynetURL);
+    loadSkynetTopic();
     skynetButtonURL="http://"+skynetURL+"/TopicEdit.seam?topicTopicId="+topicID;
 }
 
