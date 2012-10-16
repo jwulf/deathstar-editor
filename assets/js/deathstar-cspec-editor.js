@@ -12,12 +12,20 @@ window.onbeforeunload = function (e) {
 		return 'You have unsaved changes.';
 };
 
+function errorOutput(text){
+	cmdOutput(text, true, 'errormsg');
+}
+
 function debugOutput(text, newline){
-	cmdOutput(text, newline, 'cmdtext');
+	cmdOutput(text, newline, 'cmdmsg');
+}
+
+function successOutput(text){
+	cmdOutput(text, true, 'successmsg');
 }
 
 function timestampOutput(text){
-	cmdOutput(getDate() + ' ' + text, true, 'timestamptext');
+	cmdOutput(getDate() + ' ' + text, true, 'timestampmsg');
 }
 
 function cmdOutput(text, newline, cmdclass){
@@ -27,7 +35,11 @@ function cmdOutput(text, newline, cmdclass){
 		posttext = '</span>'
 	}
 	var eol = newline ? '<br><br>' : '<br>';
-	$('#div-preview-inline:last-child').html($('#div-preview-inline:last-child').html() + pretext + text + posttext + eol);
+	var myDiv = document.getElementById('div-preview-inline');
+	var isScrolled = myDiv.scrollTop == myDiv.scrollHeight - myDiv.offsetHeight;
+	myDiv.innerHTML += pretext + text + posttext + eol;
+  //  if(isScrolled)
+  myDiv.scrollTop = 999999;
 }
 
 function newCmdOutput(text){
@@ -95,13 +107,34 @@ function pageSetup(){
         	lineNumbers: true
         });
 
+//  $(window).unload(function(){ layoutState.save('deathstar-spec-editor-layout') });
+
   myLayout = $('body').layout({
   	applyDefaultStyles: true,
   	stateManagement__enabled: true, 
-  	onresize_end: resizePanes
-  });
+  	onresize_end: resizePanes, 
+  	useStateCookie: true,
+  	 cookie: {
+    //  State Management options
+        name: "deathstar-spec-editor-layout" // If not specified, will use Layout.name
+    ,   autoSave: true // Save cookie when page exits?
+    ,   autoLoad: true // Load cookie when Layout inits?
+    //  Cookie Options
+    ,   domain: ""
+    ,   path: ""
+    ,   expires: "30" // 'days' -- blank = session cookie
+    ,   secure: false
+    //  State to save in the cookie - must be pane-specific
+    ,   keys: "north.size,south.size,east.size,west.size,"+
+ 
+"north.isClosed,south.isClosed,east.isClosed,west.isClosed,"+
+ 
+"north.isHidden,south.isHidden,east.isHidden,west.isHidden"
+    }
+}); 
 
   $('#save-button').click(pushSpec);
+  $('#push-align').click(pushSpecPermissive);
   $('#validate-button').click(validateSpec);
   $('#save-button').prop('disabled', true);
   $('#revert-button').prop('disabled', true);
@@ -131,40 +164,55 @@ function resizePanes() {
 	$('#div-preview-inline').width(paneSize - 15);          
 }    
 
-function pushSpec()
+function pushSpec(){
+	pushSpecRoute('push');
+}
+
+function pushSpecPermissive()
 {
-	socket && emitPush();
- 	socket || (socket = io.connect(nodeServer)); // TIP: .connect with no args does auto-discovery
-	socket.on('connect', function () { // TIP: you can avoid listening on `connect` and listen on events directly too!
-  	debugOutput('Connected to server ' + nodeServer);
-	
-  	socket.on('cmdoutput', function (msg){
-  		cmdOutput(msg);
-  	});
+	if (confirm('Rewrite topic titles to align them with the latest edits?'))
+		pushSpecRoute('push', '-p');
+}
 
-  	socket.on('cmdfinish', function (msg){timestampOuput('Push operation completed.')});
+function pushSpecRoute(cmd, opts)
+{
+	socket || (socket = io.connect(nodeServer)); 	
+	socket && emitPush(cmd, opts);
+	socket.on('connect', function () {
+		debugOutput('Connected to server ' + nodeServer);
 
-  	socket.on('cmdexit', function(msg){ 
+		socket.on('cmdoutput', function (msg){
+			cmdOutput(msg);
+		});
+
+		socket.on('cmdfinish', function (msg){});
+
+		socket.on('cmdexit', function(msg){ 
     	//socket.disconnect();
     	if (msg == '0') {
-    		cmdOutput('Server reported push successful', true);
+    		successOutput('Content Specification pushed successfully', true);
     		loadSkynetTopic();
     	}
     	else
     	{
-    		cmdOutput('Exit Code: ' + msg, true);
+    		errorOutput('The push was not successful. Exit Code: ' + msg, true);
     	}
+    	endServerTask();
     });
-  	emitPush();
-
-  });
+	});
 }
 
-function emitPush()
+function emitPush(cmd, opts)
 {
-	newCmdOutput();
-	timestampOutput(' Initiating push');
-	socket.emit('pushspec', {'command':'push', 'server': deets.skynetURL, 'spec': editor.getValue()});
+	var cmdobj = {
+		'command' : cmd, 
+		'server' : deets.skynetURL, 
+		'spec': editor.getValue()
+	};
+	if (opts) cmdobj.opts = opts;
+	timestampOutput(' Initiating ' + cmd);
+	socket.emit('pushspec', cmdobj);
+	startServerTask();
 }
 
 function validateSpec()
@@ -172,28 +220,53 @@ function validateSpec()
 	socket && emitValidate();
   	socket || (socket = io.connect(nodeServer)); // TIP: .connect with no args does auto-discovery
   	socket.on('connect', function () { // TIP: you can avoid listening on `connect` and listen on events directly too!
-  	debugOutput('Connected to server ' + nodeServer);
-  	socket.on('cmdoutput', function (msg){
-  		cmdOutput(msg);
-  	});
-  	socket.on('cmdfinish', function (msg){timestampOutput('Validation operation completed.')});
+  		debugOutput('Connected to server ' + nodeServer);
+  		socket.on('cmdoutput', function (msg){
+  			cmdOutput(msg);
+  		});
+  	//socket.on('cmdfinish', function (msg){timestampOutput('Validation operation completed.')});
   	socket.on('cmdexit', function(msg){
     	//socket.disconnect(); 
     	if (msg == '0') {
-    		cmdOutput('Validation successful', true);
+    		successOutput('The Content Specification is valid', true);
     		loadSkynetTopic();
     	}
     	else
     	{
-    		cmdOutput('Exit Code: ' + msg, true);
+    		var errormsg = 'There was an error performing the validation. Exit code: ' + msg;
+    		if (msg == '8') errormsg = 'The Content Specification is not valid';
+    		errorOutput(errormsg, true);
     	}
+    	endServerTask();
     });
   	emitValidate();
   });
-}
+  }
 
-function emitValidate(){
-	timestampOutput(' Initiating validate');
-	newCmdOutput();
-	socket.emit('pushspec', {'command':'validate', 'server': deets.skynetURL, 'spec': editor.getValue()});
-}
+  function emitValidate(){
+  	timestampOutput(' Initiating validate');
+  	newCmdOutput();
+  	socket.emit('pushspec', {'command':'validate', 'server': deets.skynetURL, 'spec': editor.getValue()});
+  	startServerTask();
+  }
+
+  function startServerTask()
+  {
+  	$("#save-button").button('loading');
+  	$("#push-menu").button('loading');
+  	$("#validate-button").button('loading');
+  	$("#revert-button").button('loading');
+  	editor.setOption('readOnly', 'nocursor');
+  	$('.CodeMirror').addClass('editor-readonly');	
+
+  }
+
+  function endServerTask()
+  {
+  	$("#save-button").button('reset');
+  	$("#push-menu").button('reset');
+  	$("#validate-button").button('reset');
+  	$("#revert-button").button('reset');
+  	editor.setOption('readOnly', false);
+  	$('.CodeMirror').removeClass('editor-readonly');
+  }

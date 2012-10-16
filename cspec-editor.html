@@ -29,8 +29,6 @@
 	<script src="assets/js/deathstar-editor-common.js"></script>
 	<script src="assets/js/deathstar-pressgang-rest-utils.js"></script>
 	<script src="assets/js/deathstar-cspec-editor.js"></script>
-  <!--  <script src="assets/js/deathstar-editor.js"></script>
-  <script src="assets/js/deathstar-topiceditor.js"></script> -->
 </head>
 
 <body onload="specEditorload()">
@@ -42,7 +40,6 @@
 			</div> 
 		</div> 
 	</div>
-	<!--  <div class="container"> -->
 
 	<div class="ui-layout-center">    
 		<div class="subnav">
@@ -50,91 +47,49 @@
 				<li class="active">
 					<a href="#edit" data-toggle="tab">Edit</a>
 				</li>
-				<!-- <li class>
-					<a href="#preview" data-toggle="tab">Preview</a>
-				</li>
-				<li class> -->
+				<li>
 					<a href="#help" data-toggle="tab">Help</a>
 				</li>
-				<!-- <li class>
-					<a href="#docbook" data-toggle="tab">Docbook Reference</a>
-				</li> -->
 			</ul>
 
 			<div class="tab-content">
 
 				<div class="tab-pane fade active in" id="edit">
-					<div class="btn-toolbar" id="toolbuttons"><!-- 
-
-						<div class="btn-group">
-							<a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#" rel="popover" data-content="Insert Docbook templates" data-original-title="Insert Docbook">
-								Insert Docbook
-								<span class="caret"></span>
-							</a>
-							<ul class="dropdown-menu">
-								<li><a href="#" rel="popover" data-content="Inject a template for a code example with multiple programming language versions" data-original-title="Code Tabs" id="codetabs-button">Code Tabs</a></li>
-								<li><a href="#" rel="popover" data-content="Inject a template for a code example with a single programming language version" data-original-title="Code Tabs Lite" id="codetabs-lite-button">Code Tabs-lite</a></li>
-								<li><a href="#" class="inject-template" id="inject-picture">Skynet Image</a></li>
-								<li><a href="#" class="inject-template" id="inject-procedure">&lt;procedure&gt;</a></li>
-								<li><a href="#" class="inject-template" id="inject-twocolumntable">&lt;table&gt; (2-col)</a></li>
-								<li><a href="#" class="inject-template" id="inject-threecolumntable">&lt;table&gt; (3-col)</a></li>
-								<li><a href="#" class="inject-template" id="inject-varlistentry" rel="popover" data-content="Inject a template for a &lt;varlistentry&gt;" data-original-title="&lt;varlistentry&gt;">&lt;varlistentry&gt;</a></li>
-							</ul>
-						</div>
-
-						<div id="buttons-xml-tag-wrap" class="btn-group">
-							<button class="btn btn-mini" rel="popover" data-content="Wrap a text selection in an XML tag. Hotkey: Ctrl-Shift-D" data-original-title="XML Tag Wrap Selection" id="tagwrap-button">XML Tag Wrap</button>
-						</div>
-
-						<div id="buttons-find-and-replace" class="btn-group">
-							<button class="btn btn-mini" rel="popover" data-content="Find Previous. Hot Key: Shift-Ctrl-F / Cmd-Option-F" data-original-title="Find Previous" id="find-previous-button">&lt;</button>
-							<button class="btn btn-mini" rel="popover" data-content="Find text in the current topic. Hotkey: Ctrl-F / Cmd-F" data-original-title="Find" id="find-button">Find</button>
-							<button class="btn btn-mini" rel="popover" data-content="Find Next. Hot Key: Ctrl-G / Cmd-G" data-original-title="Find Next" id="find-next-button">&gt;</button>
-
-							<button class="btn btn-mini" rel="popover" data-content="Replace text in the current topic. Hotkey: Shift-Ctrl-F / Cmd-Option-F. | Replace All - Hot key: Shift-Ctrl-R / Shift-Cmd-Option-F" data-original-title="Replace" id="replace-button">Replace</button>
-							<button class="btn dropdown-toggle" data-toggle="dropdown">
-								<span class="caret"></span>
-							</button>
-							<ul class="dropdown-menu">
-								<li><a href="#" id="replace-all-button">Replace All</a></li>
-							</ul>
-						</div>
-
-						<div id="buttons-toggles" class="btn-group" data-toggle="buttons-checkbox">
-							<button id="tagCloseToggle" class="btn btn-mini btn-primary" rel="popover" data-content="Toggle automatic XML tag closure on/off" data-original-title="Close XML Tags">Close XML Tags</button>
-							<button class="btn btn-mini btn-primary" rel="popover" data-content="Toggle interface help hints on/off" data-original-title="Show Help Hints" id="helpHintToggle">Show Hints</button>
-						</div>
-
-					 --></div>
-
-
 					<form><textarea id="code" name="code"></textarea></form>
 
 					<div class="btn-toolbar" id="editor-buttons">
 
-						<button id="validate-button" class="btn" rel="popover" data-original-title="Validate" data-content="Perform Docbook DTD validation of the editor content using a web service">Validate</button>
+						<div class="btn-group">
+							<button id="validate-button" data-loading-text="Working..." class="btn btn-primary" rel="popover" data-original-title="Validate" data-content="Perform Docbook DTD validation of the editor content using a web service">Validate</button>
+						</div>	
 
-						<button class="btn" id="save-button" rel="popover" data-original-title="Save" data-content="Push the contentspec to the server" >Push</button>
+						<div class="btn-group dropup">
+							<button class="btn btn-danger" data-loading-text="Working..." id="save-button">Push</button>
+							<button class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+								<span class="caret"></span>
+							</button>
+							<ul id="push-menu" data-loading-text="Working..." class="dropdown-menu">
+								<li id="push-align"><a href="#">Push Align</a></li>
+							</ul>
+						</div>
 
-						<button class="btn" id="revert-button" rel="popover" data-original-title="Revert" data-content="Reload the editor content from the server">Revert</button>
 
-						<button class="btn" id="skynet-button" rel="popover" data-original-title="Open in Skynet" data-content="Open the topic in the Skynet editor">Open in Skynet</button>
+						<div class="btn-group">
+							<button class="btn" id="revert-button" data-loading-text="Working..." rel="popover" data-original-title="Revert" data-content="Reload the editor content from the server">Revert</button>
+						</div>	
+
+						<div class="btn-group">
+							<button class="btn" id="skynet-button" rel="popover" data-original-title="Open in Skynet" data-content="Open the topic in the Skynet editor">Open in Skynet</button>
+						</div>	
 					</div>
 
 				</div>
-
-				<div class="tab-pane fade" id="preview">
-					<div id="div-preview-pane" class="div-preview"></div>
-				</div>
-				<div class="tab-pane fade" id="help"></div>
-				<!--   <div class="tab-pane fade" id="docbook"></div> -->
-
 
 			</div>
 		</div>
 	</div>
 	<div class="ui-layout-east">
-		<div id="div-preview-inline" class="div-preview"></div>
+		<div id="div-preview-inline" class="div-preview cmd-output-pane"></div>
 	</div>
 
 	<div class="ui-layout-south">
@@ -143,6 +98,6 @@
 		</div>
 		<div id="div-validation" class="div-validation"></div>
 	</div>
-	<!--</div>-->
+
 </body>
 </html>

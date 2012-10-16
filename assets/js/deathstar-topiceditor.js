@@ -648,12 +648,29 @@ function initializeTopicEditPage(){
        e.preventDefault();
      });
 
-    myLayout = $('body').layout({
-      applyDefaultStyles: true,
-      stateManagement__enabled: true, 
-      onresize_end: resizePanes
-    });
-    
+   myLayout = $('body').layout({
+    applyDefaultStyles: true,
+    stateManagement__enabled: true, 
+    onresize_end: resizePanes, 
+    useStateCookie: true,
+     cookie: {
+    //  State Management options
+        name: "deathstar-topic-editor-layout" // If not specified, will use Layout.name
+    ,   autoSave: true // Save cookie when page exits?
+    ,   autoLoad: true // Load cookie when Layout inits?
+    //  Cookie Options
+    ,   domain: ""
+    ,   path: ""
+    ,   expires: "30" // 'days' -- blank = session cookie
+    ,   secure: false
+    //  State to save in the cookie - must be pane-specific
+    ,   keys: "north.size,south.size,east.size,west.size,"+
+ 
+"north.isClosed,south.isClosed,east.isClosed,west.isClosed,"+
+ 
+"north.isHidden,south.isHidden,east.isHidden,west.isHidden"
+    }
+}); 
   resizePanes();
 
     generateRESTParameters();  

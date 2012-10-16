@@ -19,6 +19,7 @@ function getDate() {
 
 function disableSaveRevert()
 {
+    $('.save-button').prop('disabled', true);
     $('#save-button').prop('disabled', true);
     $('#revert-button').prop('disabled', true);
 }

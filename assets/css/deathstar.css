@@ -42,6 +42,7 @@ float:right;
 padding-top: 5px;
 }
 
+
 .saverevert {
 padding-left: 20px;
 padding-right: 20px;
@@ -93,12 +94,23 @@ padding-right: 10px;
  text-align: left;
 }
 
-.cmdtext {
-  color: grey
+.cmd-output-pane{
+  overflow: auto;
+}
+.cmdmsg {
+  color: gray;
 }
 
-.timestamptext {
-  color: red
+.timestampmsg {
+  color: blue;
+}
+
+.errormsg {
+  color: red;
+}
+
+.successmsg {
+  color: green;
 }
 
 .ui-button .ui-button-text{
@@ -132,4 +144,24 @@ padding-right: 10px;
 
 .CodeMirror-wrap pre {
   word-break: break-all; 
+}
+
+.editor-readOnly {
+display:block;
+//position:absolute;
+top:0px;
+bottom:0px;
+opacity:0.2;
+filter:alpha(opacity=3);
+background-color: gray;
+height:expression(parentElement.scrollHeight + 'px');
+width:100%;
+/*border-radius*/
+-webkit-border-radius:.66em;
+   -moz-border-radius:.66em;
+        border-radius:.66em;
+/*box-shadow*/
+-webkit-box-shadow:0 0 5em rgba(0,0,0,0.32);
+   -moz-box-shadow:0 0 5em rgba(0,0,0,0.32);
+        box-shadow:0 0 5em rgba(0,0,0,0.32);
 }
