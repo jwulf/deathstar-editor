@@ -96,8 +96,8 @@ function handleHTMLPreviewResponse(ajaxRequest, serverFunction){
 
   }          
 }
-
-function doValidate(callback)
+f
+function doValidate(me, callback)
 {
   if (! $("#validate-button").prop("disabled") == true || callback)
   {
@@ -123,7 +123,7 @@ function doSave()
     // if the validate button is enabled, then we'll call validation before saving
     if ( $("#validate-button").prop('disabled') == false)
       // This needs to be a callback, because validation is asynchronous
-     { doValidate(doActualSave); }
+     { doValidate(null, doActualSave); }
     else
     { doActualSave(); }
   }
@@ -198,7 +198,7 @@ function doActualSave()
 }
 
 // Sends the editor content to a node server for validation
-function serversideValidateTopic(editor, callback){
+function serversideValidateTopic(editor, cb){
 
   function validationCallback(data, cb){
       validationServerResponse=1;
@@ -207,7 +207,7 @@ function serversideValidateTopic(editor, callback){
         showStatusMessage("Topic XML is valid Docbook 4.5",'', 'alert-success');
         validXML=true;
         $("#validate-button").prop('disabled', true); 
-        if (callback && typeof(callback)=="function") callback(); 
+        if (cb && typeof(cb)=="function") cb(); 
         } 
       else {
         showStatusMessage('Topic has errors (click to reveal/hide)', data, 'alert-error');
@@ -216,17 +216,17 @@ function serversideValidateTopic(editor, callback){
       }
   }
 
-  $.post(nodeServer + "/topicvalidate", editor.getValue(),
+  $.post(nodeServer + "/rest/1/dtdvalidate", {'xml': editor.getValue()},
     function(data){
-      validationCallback(data, callback);
+      validationCallback(data, cb);
     })
   .error(function(a){
       // WORKAROUND: Google Chrome calls the error function on status 200, so this is workaround
-    if (a.status == 200){ validationCallback(a.responseText, callback)}
+    if (a.status == 200){ validationCallback(a.responseText, cb)}
       else
       {
     showStatusMessage("Communication error requesting validation: " + a.status + ':' + a.responseText, '', 'alert-error');
-    callback && callback();
+    if (cb) cb();
     }
   })
 

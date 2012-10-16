@@ -93,6 +93,14 @@ padding-right: 10px;
  text-align: left;
 }
 
+.cmdtext {
+  color: grey
+}
+
+.timestamptext {
+  color: red
+}
+
 .ui-button .ui-button-text{
   padding: 0.2em 0.2em;
   font-size: 0.8em;
