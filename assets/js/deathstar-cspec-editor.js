@@ -36,10 +36,13 @@ function cmdOutput(text, newline, cmdclass){
 	}
 	var eol = newline ? '<br><br>' : '<br>';
 	var myDiv = document.getElementById('div-preview-inline');
-	var isScrolled = myDiv.scrollTop == myDiv.scrollHeight - myDiv.offsetHeight;
-	myDiv.innerHTML += pretext + text + posttext + eol;
-  //  if(isScrolled)
-  myDiv.scrollTop = 999999;
+	var s = myDiv.innerHTML;
+	var anchor='<a id="end"></a>'
+	var news = s.substring(0, s.indexOf(anchor)) + pretext + text + posttext + eol + anchor;
+	myDiv.innerHTML = news;
+	document.getElementById('end').scrollIntoView();
+//	myDiv.innerHTML += pretext + text + posttext + eol + '<a id="end"/>';
+  
 }
 
 function newCmdOutput(text){
