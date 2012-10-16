@@ -1,5 +1,4 @@
-// TODO: Get rid of this default and make it auto-detect
-defaultNodeServer="http://deathstar1.usersys.redhat.com:8888"
+
 
 function loadSkynetTopicJsonP(topicID, skynetURL, cb)
 {

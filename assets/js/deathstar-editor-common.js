@@ -1,3 +1,6 @@
+// TODO: Get rid of this default and make it auto-detect
+defaultNodeServer="http://deathstar1.usersys.redhat.com:3000"
+
 /** 
  * Format a date as Day Month DD YYYY HH:MM:SS PM 
 From: http://kjvarga.blogspot.com.au/2009/04/output-javascript-date-in-human.html
