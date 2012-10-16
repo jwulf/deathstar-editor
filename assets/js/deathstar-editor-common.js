@@ -1,5 +1,5 @@
 // TODO: Get rid of this default and make it auto-detect
-defaultNodeServer="http://deathstar1.usersys.redhat.com:3000"
+defaultNodeServer= function(){return "http://deathstar1.usersys.redhat.com:3000"}();
 
 /** 
  * Format a date as Day Month DD YYYY HH:MM:SS PM 

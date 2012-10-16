@@ -96,7 +96,7 @@ function handleHTMLPreviewResponse(ajaxRequest, serverFunction){
 
   }          
 }
-f
+
 function doValidate(me, callback)
 {
   if (! $("#validate-button").prop("disabled") == true || callback)
