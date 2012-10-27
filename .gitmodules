@@ -1,0 +1,4 @@
+[submodule "definitely-typed"]
+    path = typescript-definitions
+    url = git://github.com/borisyankov/DefinitelyTyped.git
+
