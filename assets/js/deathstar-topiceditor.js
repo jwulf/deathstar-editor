@@ -5,6 +5,8 @@
 // 3. General usability enhancements like coloured state messages and action button locations
 
 defaultnodeServer="http://deathstar1.usersys.redhat.com:8888"
+
+previewRenderErrorMsg = '<p>Could not transform</p>'
 // window.previewserverurl="http://127.0.0.1:8888";
 var nodeServer;
 window.refreshTime=1000;
@@ -36,8 +38,8 @@ $(window).keypress(function(event) {
 $(document).keydown(function(event) {
     // Ctrl-Shift-D hotkey for Tag Wrap
     if (String.fromCharCode(event.which).toLowerCase() == 'd' && event.ctrlKey && event.shiftKey){
-	 doTagWrap();
-	return false;
+   doTagWrap();
+  return false;
     }
 
     // Ctrl-S hotkey for Save
@@ -67,35 +69,23 @@ window.onbeforeunload = function (e) {
 };
 
 // callback function for use when a node server is generating the live HTML preview
-function handleHTMLPreviewResponse(ajaxRequest, serverFunction){
-  if (ajaxRequest.readyState==4)
+function handleHTMLPreviewResponse(preview, serverFunction){
+  if ( preview != previewRenderErrorMsg )                    
   {
-    window.mutex = 0;
-    if (ajaxRequest.status == 200 || ajaxRequest.status == 304)
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(preview, 'text/xml');
+    section = doc.getElementsByClassName("section");
+    if (section !== null)
     {
-
-      if (serverFunction == "preview")
-      {
-
-        divpreview=document.getElementById("div-preview");
-            if (divpreview.hasChildNodes)
-              while(divpreview.hasChildNodes())
-                divpreview.removeChild(divpreview.lastChild);
-                            
-        if (ajaxRequest.responseXML !== null)
-        {
-          section=ajaxRequest.responseXML.getElementsByClassName("section");
-          if (section !== null)
-          {
-            divpreview.appendChild(section[0]);
-          }
-        }
-      }
-
+      $(".div-preview").empty();
+      $(".div-preview").append(section[0]);
     }
+  } else {
+     showStatusMessage('Topic cannot be rendered - XML not well-formed', '', 'alert-error');
 
-  }          
+  }
 }
+  
 
 function doValidate(me, callback)
 {
@@ -107,11 +97,11 @@ function doValidate(me, callback)
 }
 
 function hideSpinner(spinner){
-	$(spinner).css("visibility", "hidden");
+  $(spinner).css("visibility", "hidden");
 }
 
 function showSpinner(spinner){
-	$(spinner).css("visibility", "visible");
+  $(spinner).css("visibility", "visible");
 }
 
 // Checks if the topic is valid, and then persists it using a node proxy to do the PUT
@@ -132,33 +122,17 @@ function doSave()
 
 function doActualSave()  
 {
-	if (! validXML && validationServerResponse == 1)
-	{
-	    alert("This is not valid Docbook XML. If you are using Skynet injections I cannot help you.");
+  if (! validXML && validationServerResponse == 1)
+  {
+      alert("This is not valid Docbook XML. If you are using Skynet injections I cannot help you.");
       $("#validate-button").prop("disabled", false);
-	}
+  }
   if (validationServerResponse == 0)
     alert("Unable to perform validation. Saving without validation.");
 
   showStatusMessage("Performing Save...", '', 'alert-info');
 
   requestURL="/seam/resource/rest/1/topic/update/json";  
- 
-/*    var postit = $.post('http://'+ skynetURL + requestURL, {
-      'id' : topicID,
-      'configuredParameters' : ['xml'],
-      'xml' : editor.getValue()}, 
-      function(data){
-        showStatusMessage("Saved OK", '', 'alert-success');
-          $("#save-button").prop("disabled", true);
-          $("#revert-button").prop("disabled", true);
-          if (! validXML) doValidate();
-      }, 'application/json; charset=UTF-8')
-    .error(function(a){
-      showStatusMessage("Error saving. Status code: " + a.status, '', 'alert-error');
-      enableSaveRevert();
-    });
-	 */
     
   saveAjaxRequest= new XMLHttpRequest();
   saveAjaxRequest.global=true;
@@ -229,47 +203,13 @@ function serversideValidateTopic(editor, cb){
     if (cb) cb();
     }
   })
-
-  /*ajaxRequest = new XMLHttpRequest();
-  //ajaxStart();
-  ajaxRequest.onreadystatechange=function()
-  {
-     if (ajaxRequest.readyState==4)
-     {
-        //ajaxStop();
-        if (ajaxRequest.status == 200 || ajaxRequest.status == 304)
-        {
-          validationServerResponse=1;
-          if (ajaxRequest.responseText == "0")
-          { 
-            showStatusMessage("Topic XML is valid Docbook 4.5",'', 'alert-success');
-            validXML=true;
-            $("#validate-button").prop('disabled', true); 
-            if (callback && typeof(callback)=="function") callback(); 
-            } 
-          else {
-            showStatusMessage('Topic has errors (click to reveal/hide)', ajaxRequest.responseText, 'alert-error');
-            validXML=false;
-            if (callback && typeof(callback)=="function") callback();
-          }
-        }
-        else
-        {
-        	showStatusMessage("Error performing validation: " + ajaxRequest.status, '', 'alert-error');
-        }
-     }
-  }
-  validationServerReponse=0;
-  ajaxRequest.open("POST", nodeServer + "/topicvalidate", true);
-  ajaxRequest.setRequestHeader("Content-Type", "text/xml");
-  ajaxRequest.send(editor.getValue());*/
 }
 
 function updateXMLPreviewRoute(cm,preview){
   // serverFunction = "validate";
-  // serverFunction = "preview";
-  //serversideUpdateXMLPreview(cm,preview, serverFunction);
-  clientsideUpdateXMLPreview(cm,preview);
+   serverFunction = "preview";
+   serversideUpdateXMLPreview(cm,"preview");
+  //clientsideUpdateXMLPreview(cm,preview);
 }
 
 function loadXMLDoc(dname)
@@ -362,18 +302,25 @@ function serversideUpdateXMLPreview(cm, serverFunction){
   //   
 
    //preview.innerHTML=cm.getValue();
-  if (window.mutex == 0)
-  {  
-    ajaxRequest = new XMLHttpRequest();
-    ajaxRequest.onreadystatechange=function()
-    {
-        handleHTMLPreviewResponse(ajaxRequest, serverFunction);
+    if (window.mutex == 0)
+    {  
+
+      $.post(nodeServer + "/rest/1/xmlpreview", {xml :   cm },
+        function(data){
+          handleHTMLPreviewResponse(data, serverFunction);
+            window.mutex = 0;
+        })
+      .error(function(a){
+        window.mutex = 0;
+        // WORKAROUND: Google Chrome calls the error function on status 200, so this is workaround
+          if (a.status == 200){ handleHTMLPreviewResponse(a.responseText, serverFunction);}
+          else {
+            showStatusMessage("Communication error requesting preview: " + a.status + ':' + a.responseText, '', 'alert-error');
+          }
+        });
+      window.mutex = 1;  
     }
-    ajaxRequest.open("POST", nodeServer + "/xmlpreview", true);
-    ajaxRequest.setRequestHeader("Content-Type", "text/xml");
-    ajaxRequest.send(cm.getValue());
-    window.mutex = 1;   
-  }
+
 }
 
 /*function onUnload()
@@ -569,33 +516,33 @@ function initializeTopicEditPage(){
 
   // Create our Codemirror text editor
   window.editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-    		mode: 'text/html',
-		extraKeys: {
-			"'>'": function(cm) { cm.closeTag(cm, '>'); },
-			"'/'": function(cm) { cm.closeTag(cm, '/'); }
-  		},	   			
-		onChange: function(cm, e) {
+        mode: 'text/html',
+    extraKeys: {
+      "'>'": function(cm) { cm.closeTag(cm, '>'); },
+      "'/'": function(cm) { cm.closeTag(cm, '/'); }
+      },          
+    onChange: function(cm, e) {
       enableSaveRevert();
-			makeValidityAmbiguous();
-			},
-		onKeyEvent: function(cm, e) {
-			  if (window.timerID == 0) 
-          		window.timerID = setTimeout("timedRefresh()", window.refreshTime);
-       			 k=e.keyCode;
-        		if (k != 16 && k != 17 && k != 18 && k != 20 && k != 19 && k != 27 && k != 36 && k != 37 && k != 38 && k != 39 && k !=40 && k != 45)
-        		{
-          			enableSaveRevert();
-          			makeValidityAmbiguous();
-        		}
-        		return false; // return false tells Codemirror to also process the key;
-		}, 
-	  	wordWrap: true,
-	  	lineWrapping: true,
-	  	height: myHeight,
-          	width: myWidth,
-	  	disableSpellcheck: false,
-          	lineNumbers: true
-	});
+      makeValidityAmbiguous();
+      },
+    onKeyEvent: function(cm, e) {
+        if (window.timerID == 0) 
+              window.timerID = setTimeout("timedRefresh()", window.refreshTime);
+             k=e.keyCode;
+            if (k != 16 && k != 17 && k != 18 && k != 20 && k != 19 && k != 27 && k != 36 && k != 37 && k != 38 && k != 39 && k !=40 && k != 45)
+            {
+                enableSaveRevert();
+                makeValidityAmbiguous();
+            }
+            return false; // return false tells Codemirror to also process the key;
+    }, 
+      wordWrap: true,
+      lineWrapping: true,
+      height: myHeight,
+            width: myWidth,
+      disableSpellcheck: false,
+            lineNumbers: true
+  });
 
     // Toggle Close Tag
     $('#tagCloseToggle').click(toggleAutoCloseTag);
@@ -702,87 +649,87 @@ function doReplace(){
 // It uses the id attribute of the sub-menu entry to look up the template in a 
 // dictionary. 
 function injectTemplate(){
-  var templates={'inject-varlistentry': '  	<varlistentry>\n\
-    	<term></term>\n\
-      	<listitem>\n\
+  var templates={'inject-varlistentry': '   <varlistentry>\n\
+      <term></term>\n\
+        <listitem>\n\
           <para></para>\n\
         </listitem>\n\
     </varlistentry>',
     'inject-twocolumntable' :
     '   <table>\n\
-	   <title></title>\n\
-	    <tgroup cols="2">\n\
-		   <thead>\n\
-			   <row>\n\
-				   <entry>\n\
-					   Column 1 heading\n\
-				   </entry>\n\
-				    <entry>\n\
-					   Column 2 heading\n\
-				   </entry>\n\
-			   </row>\n\
-		   </thead>\n\
-		    <tbody>\n\
-			   <row>\n\
-				   <entry>\n\
-				      <para>\n\
-				      </para>\n\
-				   </entry>\n\
-				   <entry>\n\
-					   <para>\n\
-					   </para>\n\
-				   </entry>\n\
-			   </row>\n\
-		   </tbody>\n\
-	   </tgroup>\n\
+     <title></title>\n\
+      <tgroup cols="2">\n\
+       <thead>\n\
+         <row>\n\
+           <entry>\n\
+             Column 1 heading\n\
+           </entry>\n\
+            <entry>\n\
+             Column 2 heading\n\
+           </entry>\n\
+         </row>\n\
+       </thead>\n\
+        <tbody>\n\
+         <row>\n\
+           <entry>\n\
+              <para>\n\
+              </para>\n\
+           </entry>\n\
+           <entry>\n\
+             <para>\n\
+             </para>\n\
+           </entry>\n\
+         </row>\n\
+       </tbody>\n\
+     </tgroup>\n\
    </table>',
     'inject-threecolumntable' :
     '   <table>\n\
-	   <title></title>\n\
-	    <tgroup cols="3">\n\
-		   <thead>\n\
-			   <row>\n\
-				   <entry>\n\
-					   Column 1 heading\n\
-				   </entry>\n\
-				    <entry>\n\
-					   Column 2 heading\n\
-				   </entry>\n\
-				   <entry>\n\
-					   Column 3 heading\n\
-				   </entry>\n\
-			   </row>\n\
-		   </thead>\n\
-		    <tbody>\n\
-			   <row>\n\
-				   <entry>\n\
-				      <para>\n\
-				      </para>\n\
-				   </entry>\n\
-				   <entry>\n\
-					   <para>\n\
-					   </para>\n\
-				   </entry>\n\
-				   <entry>\n\
-					   <para>\n\
-					   </para>\n\
-				   </entry>\n\
-			   </row>\n\
-		   </tbody>\n\
-	   </tgroup>\n\
+     <title></title>\n\
+      <tgroup cols="3">\n\
+       <thead>\n\
+         <row>\n\
+           <entry>\n\
+             Column 1 heading\n\
+           </entry>\n\
+            <entry>\n\
+             Column 2 heading\n\
+           </entry>\n\
+           <entry>\n\
+             Column 3 heading\n\
+           </entry>\n\
+         </row>\n\
+       </thead>\n\
+        <tbody>\n\
+         <row>\n\
+           <entry>\n\
+              <para>\n\
+              </para>\n\
+           </entry>\n\
+           <entry>\n\
+             <para>\n\
+             </para>\n\
+           </entry>\n\
+           <entry>\n\
+             <para>\n\
+             </para>\n\
+           </entry>\n\
+         </row>\n\
+       </tbody>\n\
+     </tgroup>\n\
    </table>',
     'inject-picture' :
     '   <figure>\n\
-		<title></title>\n\
-		<mediaobject>\n\
-			<imageobject>\n\
-				<imagedata align="center" fileref="images/PUTTHENUMBERHERE.png"/>\n\
-			</imageobject>\n\
-			<textobject>\n\
-			   <phrase>\n\
-			   </phrase>\n\
-			</textobject>\n\
-		</mediaobject>\n\
+    <title></title>\n\
+    <mediaobject>\n\
+      <imageobject>\n\
+        <imagedata align="center" fileref="images/PUTTHENUMBERHERE.png"/>\n\
+      </imageobject>\n\
+      <textobject>\n\
+         <phrase>\n\
+         </phrase>\n\
+      </textobject>\n\
+    </mediaobject>\n\
    </figure>',
     'inject-procedure':
     '   <procedure>\n\
@@ -842,7 +789,7 @@ function injectCodetabsLite(){
   var text = "";
   text = window.editor.getSelection();
   if (text){
-        newcode = codetabblock1	+ text + codetabblock3;
+        newcode = codetabblock1 + text + codetabblock3;
   }
   else
   { newcode= codetabblock1 + codetabblock2 + codetabblock3;}
@@ -876,18 +823,18 @@ function doTagWrap(){
 
 function createCommentLinks()
 {
-	editlinks=document.getElementsByClassName('edittopiclink')
-	for (var i=0; i < editlinks.length; i++)
-	{
-	  div=document.createElement('div');
-	  commentlink=document.createElement('a');
-	  newhref=editlinks[i].href.split('editor/index').join('editor/preview');
-	  commentlink.setAttribute('href', newhref);
-	  commentlink.innerHTML="Comments";
-	  commentlink.setAttribute('class', 'deathstar-preview-link');
-	  div.appendChild(commentlink);
-	  editlinks[i].parentNode.appendChild(commentlink);
-	}
+  editlinks=document.getElementsByClassName('edittopiclink')
+  for (var i=0; i < editlinks.length; i++)
+  {
+    div=document.createElement('div');
+    commentlink=document.createElement('a');
+    newhref=editlinks[i].href.split('editor/index').join('editor/preview');
+    commentlink.setAttribute('href', newhref);
+    commentlink.innerHTML="Comments";
+    commentlink.setAttribute('class', 'deathstar-preview-link');
+    div.appendChild(commentlink);
+    editlinks[i].parentNode.appendChild(commentlink);
+  }
 }
 
 function openTopicInSkynet()

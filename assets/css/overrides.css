@@ -1,0 +1,193 @@
+@import url(http://fonts.googleapis.com/css?family=PT+Mono|Open+Sans:400italic,400,600);
+
+
+/* The Publican website menu.css has a line-height set to 1em */
+
+body, h1, h2, h3, h4, h5, h6, pre, li, div {
+	line-height: normal;
+}
+
+.simplesect:after{content:""; display: block; clear: both; height:0px; width: 100%; float:none;}
+
+.RoleCreateBugPara a{
+  padding: padding: 0em 0.8em 0.2em;
+  background-color:white;
+  margin:0em .5em;
+  font-size:12px; 
+  color: lightgray;
+  border-bottom:none;
+}
+
+.RoleCreateBugPara a:visited {color: lightgray; border-bottom:none; }
+.RoleCreateBugPara {float:right; text-align:right;} 
+.RoleCreateBugPara a:link {color: lightgray; border-bottom:none;}
+.RoleCreateBugPara a:focus,
+.RoleCreateBugPara a:hover{
+border-bottom: 1px dotted red;
+color: red;
+}
+
+/* Aesthetic changes */
+
+pre {
+	font-family: "liberation mono", "bitstream vera mono", "dejavu mono", monospace;
+	display:block;
+	background-color:#eeeeee;
+	margin-bottom: 0.3em;
+	padding:.5em 1em;
+	white-space: pre-wrap; /* css-3 */
+	white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
+	white-space: -pre-wrap; /* Opera 4-6 */
+	white-space: -o-pre-wrap; /* Opera 7 */
+	word-wrap: break-word; /* Internet Explorer 5.5+ */
+/*	font-size: 0.9em; */
+  border: 1px solid #aaaaaa;
+  box-shadow: 0 0 0 #AAAAAA inset;
+	-moz-box-shadow:  0 0 0 #AAAAAA inset;
+	-webkit-box-shadow: 0 0 0 #AAAAAA inset;
+	-o-box-shadow: 0 0 0 #AAAAAA inset;
+}
+
+.command, .filename, .keycap, .classname, .literal {
+	font-family: "liberation mono", "bitstream vera mono", "dejavu mono", monospace;
+  font-weight: normal;
+	/* font-weight:bold; */
+}
+
+code {
+	font-family: "liberation mono", "bitstream vera mono", "dejavu mono", monospace;
+	white-space: pre-wrap;
+  font-weight:normal;
+	/* font-weight:bold; */
+}
+
+body { 
+font-family: "Open Sans", "liberation sans", sans-serif;
+font-size: 14px;
+font-weight: normal;
+font-variant: normal;
+}
+
+.guilabel, .guibutton {
+  font-family:  "liberation mono", "bitstream vera mono", "dejavu mono", monospace;
+  font-weight: bold;
+}
+
+/* colors and styles from the Red Hat brand */
+a:link {
+	color:#0066cc;
+}
+
+a:visited {
+	color:#6699cc;
+}
+
+dd {
+  margin-left: 0px;
+}
+
+h1 {
+	color:#a70000;
+  font-size: 42px;
+}
+
+h1.legalnotice {
+  font-size: 25px;
+}
+
+div.producttitle {
+	background: #a70000 url(../images/h1-bg.png) top left repeat;
+  font-size: 3em;
+  color: white;
+	padding: 0.5em;
+}
+
+.section h1.title {
+	color:#a70000;
+}
+
+h2{
+  font-size: 23px;
+}
+
+h2.subtitle {
+  font-size: 20px;
+}
+
+h3{
+  font-size: 21px;
+}
+
+h2,h3,h4,h5,h6 {
+	color:#a70000;
+}
+
+table {
+	border:1px solid #aaa;
+}
+
+table th {
+	background-color:#900;
+}
+
+table tr.even td {
+	background-color:#f5f5f5;
+}
+
+.revhistory table th {
+	color:#a70000;
+}
+
+.titlepage .edition {
+	color: #a70000;
+}
+
+span.remark{
+	background-color: #ffff00;
+}
+
+/* css for the code switcher */
+.codetabs pre{
+  border: 1px solid color: #AAA;
+}
+
+.code-select-li{
+  float:left;
+  list-style-type: none;
+  list-style-image: none;
+  margin-right: 0.4em;
+  background-color: whiteSmoke;
+  padding-bottom: 4px;
+}
+
+.codetabs ul{
+  padding-left: 2.6em;
+  padding-bottom: 8px;
+}
+
+.code-select-li a, .code-select-li a:visited, .code-select-li a:link{
+  color: #AAA;
+  border-bottom: none;
+  padding-bottom: 4px;
+  padding-left: 6px;
+  padding-right: 6px;
+  font-weight: bold;
+}
+
+.code-select-li a:hover{
+  border-bottom: 2px solid;
+}
+
+.code-select-li a.active {
+  color: white;
+  background-color: #AAA;
+}
+
+.code-select-li a.active:hover {
+  border-bottom: none;
+}
+
+.skynetBookID {
+  display: none;
+}
+

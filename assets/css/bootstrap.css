@@ -155,14 +155,14 @@ textarea {
           box-sizing: border-box;
 }
 
-body {
+/*body {
   margin: 0;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
   line-height: 18px;
   color: #333333;
   background-color: #ffffff;
-}
+} */
 
 a {
   color: #0088cc;
@@ -486,11 +486,11 @@ h3 small {
   font-size: 14px;
 }
 
-h4,
+/*h4,
 h5,
 h6 {
   line-height: 18px;
-}
+} */
 
 h4 {
   font-size: 14px;
@@ -504,12 +504,12 @@ h5 {
   font-size: 12px;
 }
 
-h6 {
+/*h6 {
   font-size: 11px;
   color: #999999;
   text-transform: uppercase;
 }
-
+*/
 .page-header {
   padding-bottom: 17px;
   margin: 18px 0;
@@ -670,7 +670,7 @@ cite {
   font-style: normal;
 }
 
-code,
+/*code,
 pre {
   padding: 0 3px 2px;
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
@@ -704,7 +704,7 @@ pre {
   -webkit-border-radius: 4px;
      -moz-border-radius: 4px;
           border-radius: 4px;
-}
+}*/
 
 pre.prettyprint {
   margin-bottom: 18px;

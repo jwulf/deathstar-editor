@@ -1,3 +1,5 @@
 @import url("common.css");
 @import url("overrides.css");
 @import url("lang.css");
+
+.div-preview{max-width: 703px; margin-left: 20; margin: 0 auto !important;}
