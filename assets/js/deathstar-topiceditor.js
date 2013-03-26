@@ -751,8 +751,32 @@ function injectTemplate(){
       <title>Result</title>\n\
       <para>\n\
       </para>\n\
-   </formalpara>'};
+   </formalpara>',
+   'inject-changelog':
+   '   <variablelist role="changelog">\n' +
+'      <varlistentry>\n' +
+'         <term role="changelog-toggle">Changes</term>\n' +
+'         <listitem>\n' +
+'            <itemizedlist role="changelog-items">\n' +
+'            <listitem>\n' +
+'               <!-- Docs BZ: https://bugzilla.redhat.com/show_bug.cgi?id=845223 -->\n' +
+'	       <!-- Upstream BZ: https://issues.apache.org/jira/browse/QPID-4174 -->\n' +
+'               <para role="changelog-feb-2013">\n' +
+'                  New content - generated February 2013.\n' +
+'               </para>\n' +
+'               </listitem>\n' +
+'               <listitem>\n' +
+'                  <para role="changelog-may-2013">\n' +
+'                     Updated March 2013.\n' +
+'                  </para>\n' +
+'                  <!-- add the role "changes-may-2013" to all elements affected by the change" -->\n' +
+'               </listitem>\n' +
+'            </itemizedlist>\n' +						
+'         </listitem>\n' +
+'      </varlistentry>\n' +
+'   </variablelist>\n'};
   window.editor.replaceSelection(templates[this.id]);
+  timedRefresh();
   makeValidityAmbiguous();        
 }
 
